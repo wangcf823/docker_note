@@ -1,0 +1,26 @@
+更新源码
+1、在src/static/js/app.js文件，更新第56行以使用新的空文本。
+<p className="text-center">No items yet! Add one above!</p>
+<p className="text-center">You have no todo items yet! Add one above!</p>
+2、让我们使用之前使用的相同命令构建镜像的更新版本。
+ docker build -t getting-started .
+3、让我们使用更新后的代码启动一个新的容器。
+docker run -dp 3000:3000 getting-started
+
+啊哦！您可能看到了这样的错误（ID将不同）：
+那么，发生了什么事？我们无法启动新容器，因为我们的旧容器仍在运行。这是因为容器正在使用主机的端口3000，并且计算机上只有一个进程（包括容器）可以侦听特定端口。要解决这个问题，我们需要删除旧容器。
+
+更换旧容器
+要删除容器，首先需要停止容器。一旦它停止，它就可以被删除。我们有两种方法可以移除旧容器。请随意选择你最舒适的道路。
+使用CLI删除容器
+1、使用docker ps 命令获取容器的ID
+docker ps 
+2、用docker stop命令去停止容器。
+ Swap out <the-container-id> with the ID from docker ps
+ docker stop <the-container-id>
+3、一旦容器停止，你可以使用docker rm 命令移除它：
+ docker rm <the-container-id>
+ 
+ tip:
+ 您可以在单个命令中停止和删除容器，方法是将“强制”标志添加到docker rm命令。例如：docker rm -f <the-container-id>
+ 
