@@ -1,0 +1,70 @@
+本页包含有关如何开始使用Docker的分步说明。在本教程中，您将学习如何：
+将映像作为容器构建并运行
+使用Docker Hub共享镜像
+使用带数据库的多个容器部署Docker应用程序
+使用Docker Compose运行应用程序
+
+开始教程
+docker run -d -p 80:80 docker/getting-started
+-d - run the container in detached mode (in the background)以分离模式运行容器（在后台）
+-p 80:80 -将主机的80端口映射到容器中的80端口
+docker/getting-started  - the image to use要使用得镜像
+
+tip:
+您可以组合单个字符标志以缩短完整命令。例如，上面的命令可以写成：
+ docker run -dp 80:80 docker/getting-started
+ 
+ 什么是容器？
+ 什么是容器？现在你已经运行了一个容器。简单地说，容器是计算机上的沙盒进程，与宿主机上的所有其他进程隔离。这种隔离利用了 kernel namespaces and cgroups（内核命名空间和控制组），在Linux中已经存在很长时间的功能。
+ Docker一直在努力使这些功能平易近人，易于使用。总结一下，容器：
+ 是镜像的可运行实例。您可以使用DockerAPI或CLI创建、启动、停止、移动或删除容器。
+ 1、可以在本地计算机、虚拟机上运行，也可以部署到云中。
+ 2、可移植（可在任何操作系统上运行）
+ 3、容器相互隔离，运行自己的软件、二进制文件和配置。
+ 
+ 什么是容器镜像？
+ 运行容器时，它使用隔离的文件系统。是容器镜像提供得自定义得文件系统。由于映像包含容器的文件系统，因此它必须包含运行应用程序所需的一切-所有依赖项、配置、脚本、二进制文件等。镜像还包含容器的其他配置，如环境变量、要运行的默认命令和其他元数据。
+ 
+ 简单示例
+ 创建app's容器镜像
+ 为了创建应用，我们需要使用dockerfile. dockerfile是一个简单得text脚本结构，此脚本用来创建容器镜像。如果你之前创建过dockerfile
+ 您可能会在下面的Dockerfile中看到一些缺陷。但是，别担心。我们会检查他们的。
+ 1、创建一个名为Dockerfile的文件，在和package.json同一个文件夹中。下面内容：
+ # syntax=docker/dockerfile:1
+FROM node:12-alpine
+RUN apk add --no-cache python2 g++ make
+WORKDIR /app
+COPY . .
+RUN yarn install --production
+CMD ["node", "src/index.js"]
+EXPOSE 3000
+
+检查一下Dockerfile文件没有像.txt一样的扩展名。某些编辑器可能会自动附加此文件扩展名，这将导致下一步中的错误。
+
+2、如果您还没有这样做，请打开一个终端，然后转到app目录中包含Dockerfile.现在使用构建容器镜像docker build命令。
+ docker build -t getting-started .
+ 该命令使用Dockerfile构建新的容器镜像。你可能会发现下载了很多“层”。这是因为我们指示建造者，我们希望从node:12-alpine镜像开始。但是由于我们的机器上没有它，所以需要下载该镜像。
+ 
+ 下载镜像后，我们在应用程序中复制并使用yarn安装应用程序的依赖项。当从镜像中启动容器时，cmd指令指定默认命令去运行。
+ 最后，最后，-t标志标记我们的镜像。把这看作时镜像最终的一个简单人类可读的名字。自从我们命名了镜像getting-started,当我们运行这个容器时，我们可以引用这个镜像。
+ docker build命令最后以.结尾，这是告诉docker,它应该在当前目录去寻找Dockerfile文件。
+ 
+ 
+ 开始一个app容器
+ 现在我们有一个镜像，让我们来运行application.为此，我们将使用docker run命令（还记得之前的吗?）。
+ 1、使用启动容器docker run命令并指定我们刚刚创建的映像的名称：
+  docker run -dp 3000:3000 getting-started
+ 记住-d和-p旗帜？我们正在以“分离”模式（在后台）运行新容器，并在主机的端口3000到容器的端口3000之间创建映射。如果没有端口映射，我们将无法访问应用程序。
+ 2、几秒钟后，打开Web浏览器http://localhost:3000.您应该看看我们的应用程序。
+ 3、继续添加一两个项目，并确保它按您的预期工作。您可以将项目标记为完成并删除项目。您的前端正在成功地将项目存储在后端。相当快速和简单，是吧？
+ 在这一点上，您应该有一个运行的待办事项列表管理器，其中包含一些项目，所有这些都是由您构建的。现在，让我们进行一些更改，并了解如何管理我们的容器。
+ 如果您快速查看Docker仪表板，您应该会看到您的两个容器现在正在运行（本教程和您新启动的应用程序容器）。
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
